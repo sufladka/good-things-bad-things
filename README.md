@@ -34,8 +34,7 @@ Building a custom framework from scratch can be alluring, promising tailor-made 
 Developing a custom framework demands significant investments of time, effort, and resources. Crafting an effective framework requires a deep understanding of software architecture, design patterns, and scalability principles. Additionally, creating a comprehensive solution that addresses various scenarios and edge cases introduces complexity that's often underestimated.
 
 1. **IDE support**   
-When developing custom frameworks, take in mind that frameworks usually requires additional tooling. The less a framework is popular, the more essential is tooling to support developers due to continues lack of own and community experience.  
-
+   When developing custom frameworks, keep in mind that frameworks usually require additional tooling. The less popular a framework is, the more essential the tooling becomes to support developers, given the continuous lack of both individual and community experience.
 1. **Maintenance burden and opportunity cost**   
 Once the custom framework is in place, ongoing maintenance becomes a substantial commitment. This includes fixing bugs, implementing updates, and ensuring compatibility as technology evolves. The time and resources devoted to maintaining the framework can divert attention from other critical aspects of your project, impacting its core goals.
 
