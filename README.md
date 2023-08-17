@@ -4,11 +4,11 @@
 * [Good Things - Bad Things: A Cookbook for Java Developers](#good-things---bad-things-a-cookbook-for-java-developers)
   * [Introduction](#introduction)
   * [Avoid creating custom frameworks unless you have person-years of free resources](#avoid-creating-custom-frameworks-unless-you-have-person-years-of-free-resources)
-  * [Avoid Using XML](#avoid-using-xml)
+  * [Avoid using XML](#avoid-using-xml)
   * [Avoid overusing private methods](#avoid-overusing-private-methods)
   * [Prefer declarative style over imperative one](#prefer-declarative-style-over-imperative-one)
-  * [Use Static Imports for Static Declarative APIs](#use-static-imports-for-static-declarative-apis)
-  * [Test behaviour, not implementation.](#test-behaviour-not-implementation-)
+  * [Use static imports for static declarative APIs](#use-static-imports-for-static-declarative-apis)
+  * [Test behaviour, not implementation](#test-behaviour-not-implementation)
 <!-- TOC -->
 
 ## Introduction
@@ -28,19 +28,20 @@ Welcome to the cookbook that celebrates the intricacies of our craft – where g
 ## Avoid creating custom frameworks unless you have person-years of free resources
 Building a custom framework from scratch can be alluring, promising tailor-made solutions to your development challenges. However, before embarking on this journey, consider the following factors:
 
-1. Resource intensive and complex  
+1. **Resource intensive and complex**  
 Developing a custom framework demands significant investments of time, effort, and resources. Crafting an effective framework requires a deep understanding of software architecture, design patterns, and scalability principles. Additionally, creating a comprehensive solution that addresses various scenarios and edge cases introduces complexity that's often underestimated.
 
-1. Maintenance burden and opportunity cost   
+1. **Maintenance burden and opportunity cost**   
 Once the custom framework is in place, ongoing maintenance becomes a substantial commitment. This includes fixing bugs, implementing updates, and ensuring compatibility as technology evolves. The time and resources devoted to maintaining the framework can divert attention from other critical aspects of your project, impacting its core goals.
 
-1. Bad documentation   
+1. **Bad documentation**   
 Thorough documentation is crucial for any successful tool, and custom frameworks are no exception. Crafting clear and comprehensive documentation takes considerable effort. Poor documentation can lead to confusion, frustration, and inefficiencies among your team members, hindering adoption and usability.
 
-1. Learning curve for the team  
+1. **Learning curve for the team**  
 Introducing a custom framework requires your development team to invest time in learning its intricacies. This learning curve impacts productivity, as developers adapt to new workflows and practices. Not all team members might grasp the new tool at the same pace, potentially leading to skill disparities and resistance to change.
 
-Consider the [Spring Framework](https://github.com/spring-projects/spring-framework), a Java framework established in 2004. With 754 contributors and over 27,600 commits, this framework's success story illustrates the value of long-term commitment and extensive collaboration. It showcases that even with significant resources and community support, a framework is an ongoing endeavor, continually evolving to meet changing needs.
+Take a look on any open-source framework. How long it took it to rise into useful product.  
+For example, [Spring Framework](https://github.com/spring-projects/spring-framework), a Java framework established in 2004. With 754 contributors and over 27,600 commits, significant resources and community support, a framework is an ongoing endeavor, continually evolving to meet changing needs.
 
 In conclusion, the decision to build a custom framework should be approached cautiously. Unless you have person-years of free resources to invest in development, maintenance, and documentation, leveraging well-established solutions like the Spring Framework is often more pragmatic. The complexities of framework development, coupled with the challenges of documentation and team learning, make opting for existing solutions a wise choice for most projects. Remember that simplicity and efficiency are often found not in building everything from scratch, but in leveraging the wisdom of the broader development community.
 
@@ -51,20 +52,24 @@ Framework Consumer (FC): The developer who utilizes the framework for daily task
 
 Story 0:   
 FC: This component is useless for our use case. Could you please ensure components work with real-life examples?   
-FS: We've tested it in our sandbox. It's your job to use it in real-life scenarios.    
+FS: We've tested it in our sandbox. It's your job to use it in real-life scenarios.  
+**Moral**: FS is usually out of business. That's why he develops a framework in isolation, ignoring actual business requirements.  
 
 Story 1:   
 FS: Due to limited capacity, troubleshooting the framework is now your responsibility, FC.   
 FC: Fuuuuu!  
+**Moral**: Developing a framework is expensive. FS doesn't have time to maintain a framework. He needs to develop new features.
 
 Story 2:  
 FC: (_Glancing at our tiny, chaotic, and poorly organized documentation, often lacking examples and sometimes even absent_) The documentation for our framework feels like fluffware.  
 FS: From our perspective, it's comprehensive and valuable. If you find details lacking, create tickets to address them.  
-FC: (Mentally comparing our documentation with mature open-source frameworks) I meant the documentation as a whole.  
+FC: (_Mentally comparing our documentation with mature open-source frameworks_) I meant the documentation as a whole.  
 FS: If you believe something is missed, create tickets. Goodbye.  
+**Moral**: FS provides pure documentation for a framework and don't want to evaluate it by himself first, because he doesn't consume it. 
+But it's like giving code to a team for review without reviewing it by author first, or provide feature to QA for testing without testing by author first, or provide feature to PO for acceptance without testing by QA, etc.   
+Of course, in each case the issue will be addressed. The question is in time, cost and reputation.  
 
-
-## Avoid Using XML
+## Avoid using XML
 
 I apologize if you've heavily invested in XML, but it's my strong belief that its time has come to an end. Many protocols, tools, and frameworks have moved away from this outdated format, although some still hold onto it, perhaps out of habit or nostalgia. However, the industry's shift toward more modern alternatives is undeniable.
 
@@ -108,7 +113,7 @@ private void processOrder(Order order) {
 ```
 While this may seem like a logical division, other developers might disagree or find this arrangement less intuitive or even misleading.
 
-Here are the main pitfalls:  
+Here is why:  
 1. **The complexity of understanding**.  
 A method split into numerous private methods introduces complexity in understanding the logic. Each private method might lead to other private methods, creating a complex chain that is hard to navigate. This makes comprehending the complete process a daunting task.
 1. **Rigidity and implementation mess**.  
@@ -119,7 +124,7 @@ Ironically, the correct usage of private methods might involve inlining and rede
 
 **Guidelines to consider**
 - **Clarity over quantity**: Prioritize the clarity of your code over creating numerous private methods. Ensure that your code's structure aids understanding. 
-- **Maintainable abstractions**: If you decide to use private methods, ensure they are meaningful abstractions that enhance the overall logic.
+- **Maintainable abstractions**: If you decide to use private methods, ensure they are meaningful abstractions that enhance the overall logic. 
 - [**Declarative style**](#prefer-declarative-style-over-imperative-one): Keep on eyes **what** to do, hide behind **how** to do.
 - **Code review**: Encourage code reviews and discussions to determine if the division into private methods is truly enhancing clarity.
 
@@ -131,7 +136,7 @@ Strive for a balance that contributes to code that is both maintainable and easi
 ## Prefer declarative style over imperative one
 
 Imperative APIs tell you **how** to do something, while declarative APIs tell you **what** to do. This distinction is fundamental and carries significant implications for writing efficient and maintainable code.  
-The typical declarative API in Java is the Java util Stream API.
+The typical declarative API in Java is the java.util.Stream API.
 
 An imperative API provides explicit step-by-step instructions on how to achieve a certain outcome. For example, consider sorting a collection of strings in an imperative style:
 ```java
@@ -173,10 +178,8 @@ private void validateCart() {
 ``` 
 Declarative code answers the question **how** we validate a cart: we ensure that cart is not empty, stock is sufficient, price is positive, etc. All validation rules are on your eyes.   
 Meanwhile, imperative code answers the question **what** we do in order to validate a cart: we validate items, validate price, etc. All validation rules are hidden behind private methods, while this is the only essential part of validation.
-
-**Why declarative is preferred**   
-The declarative approach is often preferred for several reasons:
-
+ 
+The declarative approach is often preferred for several reasons:  
 * **Readability**: Declarative code reads like a description of the task, making it easier to understand without getting lost in implementation details.
 * **Conciseness**: Declarative code is usually shorter and more concise, reducing the chances of errors and making the codebase easier to maintain.
 * **Abstraction**: Declarative APIs abstract the underlying complexity, allowing you to focus on what needs to be done, rather than how to do it.
@@ -201,17 +204,92 @@ Stream.of("1", "2", "3")
     .collect(toList());
 ```
 At first glance, they might seem the same, right? But actually, they aren't. The first version is notably less pleasant, squandering the tokens of your innate intelligence.  
-Now, let's attempt to translate both examples into plain English:  
+To see the difference clearer, let's attempt to translate both examples into plain English:  
 * Stream of 1, 2, 3, sorted Comparator comparing String length, collect Collectors to list.
 * Stream of 1, 2, 3, sorted comparing String length, collect to list.   
-The difference becomes clearer. The first sentence doesn't make much sense, while the second one is a proper English sentence.
-By using static imports for static methods, you're not only writing cleaner code but also crafting code that speaks a language closer to everyday conversation. This practice not only enhances readability but also demonstrates your expertise in utilizing the full potential of Java's declarative APIs.
 
-## Test behaviour, not implementation. 
-A prevalent misconception exists that unit tests should mock virtually all dependencies and scrutinize each class and method in isolation. While this approach is appropriate for testing library or utility functions, it can have detrimental effects when applied to testing business logic.
+The first sentence doesn't make much sense, while the second one is a proper English sentence, isn't it?  
 
-But what exactly are unit tests meant to achieve? Their purpose is to guarantee that your code retains functionality throughout refactoring or the introduction of new features. If you find yourself modifying code and needing to adjust tests to accommodate the new implementation, these tests become counterproductive. Worse still, they result in duplicated efforts. In simpler terms, rather than facilitating refactoring, such tests impede it.  
+By using static imports for static methods, you're not only writing cleaner code but also crafting code that speaks a language closer to everyday conversation. 
+
+## Test behaviour, not implementation
+A prevalent misconception exists that unit tests should mock virtually all dependencies and scrutinize each class and method in isolation. While this approach is appropriate for testing library or utility functions, it can have detrimental effects when applied to testing business logic.  
+
+The purpose of unit tests is to guarantee that your code retains functionality throughout refactoring or the introduction of new features. However, if you find yourself modifying code and needing to adjust tests to accommodate the new implementation, these tests become counterproductive. In simpler terms, rather than facilitating refactoring and code evolution, such tests impede it.   
+
+Additionally, when unit tests are too granular and focus on individual methods or classes, they fail to provide insights into the behavior of the system as a whole. If a granular test fails, it only tells you which line of code doesn't work, which is much less important than understanding which business scenario doesn't work. It may happen that your imagined well-tested corner case is not reachable for business scenarios at all.  
+
+To address these issues, it is important to test the behavior of the system rather than its implementation details. Instead of testing individual methods or classes in isolation, focus on testing the behavior of components or the entire business layer. This approach ensures that your tests are more resilient to changes in the implementation and provide valuable insights into the overall functionality of the system.
 
 Wrong unit test example:
-...
+```java
+public class OrderServiceTest {
 
+    @Mock
+    InventoryService inventoryService;
+    @Mock
+    EmailService emailService;
+    
+    @InjectMocks
+    OrderService orderService; 
+    
+    @Test
+    public void testPlaceOrder() {
+        // given
+        Order order = new Order(/* ... */);
+        when(inventoryService.checkAvailability(order)).thenReturn(true);
+
+        // when
+        orderService.placeOrder(order);
+
+        // then (verifies implementation details)
+        verify(inventoryService).checkAvailability(order);
+        verify(emailService).sendConfirmationEmail(order);
+    }
+}
+```
+Better unit test:
+
+```java
+public class OrderScenariosTest {
+
+  InMemoryInventoryRepository inventoryRepository = new InMemoryInventoryRepository();
+  InMemoryOrderRepository orderRepository = new InMemoryOrderRepository();
+  InMemoryEmpailService emailService = new InMemoryEmpailService();
+  OrderService orderService;
+
+  @BeforeEach
+  void init() {
+    orderService = 
+        new DefaultOrderService(
+            new DefaultInventoryService(inventoryRepository),
+            emailService,
+            orderRepository
+        );
+  }
+
+  @Test
+  public void testPlaceNewOrderWhenInventoryExists() {
+    // given
+    // setup inventory inventoryRepository.save(...)
+    // setup other necessary state of a system
+    Order order = new Order(/* ... */);
+
+    // when
+    orderService.placeOrder(order);
+
+    // then (verifies behavior, i.e. that some state changed, some notifications sent, etc. )
+    assertTnat(orderRepository.findById(order.getId())).isNotNull();
+    assertThat(emailService.getNotifications())
+            .satisfiesExactlyInAnyOrder(
+                    email -> isEmailToOwner(email), 
+                    email -> isEmailToBuyer(email)
+            );
+    // other verifications for the desired behavior
+  }
+}
+```
+However, JUnit framework is not the best choice for good unit tests. 
+There are better alternatives like [Cucumber](https://cucumber.io/) or [Spock](https://spockframework.org/). 
+
+## Write code from left to right (for sinistrodextral languages speakers)  
