@@ -359,9 +359,9 @@ Transaction.builder()
     // @formatter:off
     .with(tx -> {
         tx.transactionId = generateUniqueId();
-        tx.sender = new User("Alice");
-        tx.receiver = new User("Bob");
-        tx.amount = calculateTransactionAmount();
+        tx.sender        = new User("Alice");
+        tx.receiver      = new User("Bob");
+        tx.amount        = calculateTransactionAmount();
     })
     // @formatter:on
     .build();
