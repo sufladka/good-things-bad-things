@@ -5,6 +5,10 @@
   * [Introduction](#introduction)
   * [Avoid creating custom frameworks unless you have person-years of free resources](#avoid-creating-custom-frameworks-unless-you-have-person-years-of-free-resources)
   * [Avoid Using XML](#avoid-using-xml)
+  * [Avoid overusing private methods](#avoid-overusing-private-methods)
+  * [Prefer declarative style over imperative one](#prefer-declarative-style-over-imperative-one)
+  * [Use Static Imports for Static Declarative APIs](#use-static-imports-for-static-declarative-apis)
+  * [Test behaviour, not implementation.](#test-behaviour-not-implementation-)
 <!-- TOC -->
 
 ## Introduction
@@ -87,7 +91,121 @@ The gradual transition from XML-based configurations to more expressive alternat
 
 So, I urge you to consider the benefits of embracing newer, more efficient ways of expressing configurations and dependencies. As the development landscape evolves, it's crucial to adapt and leverage tools that make your work both enjoyable and effective.
 
+## Avoid overusing private methods
 
+There's a common misconception that breaking down a method into many private methods automatically makes it more readable, understandable, and maintainable. However, this belief can lead to a misconception itself.
+
+Private methods encapsulate the vision of their author. Imagine a scenario where a developer divides a method into several private methods, intending to enhance clarity. For instance, consider a method \`processOrder\` that encapsulates the steps of order processing:
+
+```java
+private void processOrder(Order order) {
+    validateOrder(order);
+    updateInventory(order);
+    calculateTotal(order);
+    generateInvoice(order);
+    sendConfirmationEmail(order);
+}
+```
+While this may seem like a logical division, other developers might disagree or find this arrangement less intuitive or even misleading.
+
+Here are the main pitfalls:  
+1. **The complexity of understanding**.  
+A method split into numerous private methods introduces complexity in understanding the logic. Each private method might lead to other private methods, creating a complex chain that is hard to navigate. This makes comprehending the complete process a daunting task.
+1. **Rigidity and implementation mess**.  
+Once a set of steps is defined within private methods, developers might hesitate to alter them, even if the steps no longer fit the evolving requirements. Instead, they might attempt to fit new requirements into existing methods, leading to methods that lose their original meaning and introducing confusion.
+1. **The paradox of change**.  
+Ironically, the correct usage of private methods might involve inlining and redefining them each time the process evolves. This approach aims to ensure that private methods accurately reflect any changes. However, this practice leads to significant modifications every time a change is made, resulting in a cumbersome process.
+
+
+**Guidelines to consider**
+- **Clarity over quantity**: Prioritize the clarity of your code over creating numerous private methods. Ensure that your code's structure aids understanding. 
+- **Maintainable abstractions**: If you decide to use private methods, ensure they are meaningful abstractions that enhance the overall logic.
+- [**Declarative style**](#prefer-declarative-style-over-imperative-one): Keep on eyes **what** to do, hide behind **how** to do.
+- **Code review**: Encourage code reviews and discussions to determine if the division into private methods is truly enhancing clarity.
+
+So, embrace private methods thoughtfully, with the goal of improving code understanding. 
+Remember that while private methods can simplify logic, excessive use can complicate comprehension. 
+Strive for a balance that contributes to code that is both maintainable and easily understandable.
+
+
+## Prefer declarative style over imperative one
+
+Imperative APIs tell you **how** to do something, while declarative APIs tell you **what** to do. This distinction is fundamental and carries significant implications for writing efficient and maintainable code.  
+The typical declarative API in Java is the Java util Stream API.
+
+An imperative API provides explicit step-by-step instructions on how to achieve a certain outcome. For example, consider sorting a collection of strings in an imperative style:
+```java
+var strings = List.of("Hello", "World", "!");
+var sortedStrings = new ArrayList<>(strings);
+Collections.sort(sortedStrings, (s1, s2) -> Integer.compare(s1.length(), s2.length()));
+var result = List.copyOf(sortedStrings);
+```
+In contrast, a declarative API focuses on expressing the desired outcome without specifying the step-by-step process.   
+Here's the same sorting task in a declarative style using the Stream API:
+```java
+Stream.of("Hello", "World", "!")
+    .sorted(comparing(String::length))
+    .collect(toUnmodifiableList());
+```
+
+Here is another example:
+```java
+CompositeValidator.builder()
+    // @formatter:off
+    //------- attribute ---------|----------------- rule --------------|------------- error -----------------------|
+    .with(cart::items            , isNotEmpty()                        ,   CART_IS_EMPTY                           ,
+                                   hasSufficientStock()                ,   INSUFFICIENT_STOCK                      )
+    //---------------------------|-------------------------------------|-------------------------------------------|
+    .with(cart:totalPrice        , isGreaterThan(BigDecimal.ZERO)      ,   TOTAL_PRICE_IS_ZERO_OR_NEGATIVE         )
+    //---------------------------|-------------------------------------|-------------------------------------------|
+    .with(cart:shippingAddress   , isNotNull()                         ,   SHIPPING_ADDRESS_IS_MISSING             )
+    //---------------------------|-------------------------------------|-------------------------------------------|
+    // @formatter:on
+    .validate();
+```
+In imperative style, you would find something like:  
+```java
+private void validateCart() {
+    validateItems();
+    validateTotalPrice();
+    validateShippingAddress();
+}
+``` 
+Declarative code answers the question **how** we validate a cart: we ensure that cart is not empty, stock is sufficient, price is positive, etc. All validation rules are on your eyes.   
+Meanwhile, imperative code answers the question **what** we do in order to validate a cart: we validate items, validate price, etc. All validation rules are hidden behind private methods, while this is the only essential part of validation.
+
+**Why declarative is preferred**   
+The declarative approach is often preferred for several reasons:
+
+* **Readability**: Declarative code reads like a description of the task, making it easier to understand without getting lost in implementation details.
+* **Conciseness**: Declarative code is usually shorter and more concise, reducing the chances of errors and making the codebase easier to maintain.
+* **Abstraction**: Declarative APIs abstract the underlying complexity, allowing you to focus on what needs to be done, rather than how to do it.
+
+When working with complex systems or large codebases, the declarative approach simplifies comprehension, promotes code reuse, and facilitates debugging. It helps in avoiding low-level management of resources and streamlines code into a more intuitive and natural representation of the problem.
+
+In your programming journey, strive to embrace the declarative style whenever possible. By doing so, you'll produce code that communicates intent effectively and fosters a more maintainable and collaborative development process.
+
+## Use static imports for static declarative APIs
+
+I've emphasized the importance of using declarative APIs. To make them even more elegant, consider employing static imports for static methods where appropriate. 
+Let's compare these two code snippets:
+
+```java
+Stream.of("1", "2", "3")
+    .sorted(Comparator.comparing(String::length))
+    .collect(Collectors.toList());
+```
+```java
+Stream.of("1", "2", "3")
+    .sorted(comparing(String::length))
+    .collect(toList());
+```
+At first glance, they might seem the same, right? But actually, they aren't. The first version is notably less pleasant, squandering the tokens of your innate intelligence.  
+Now, let's attempt to translate both examples into plain English:  
+* Stream of 1, 2, 3, sorted Comparator comparing String length, collect Collectors to list.
+* Stream of 1, 2, 3, sorted comparing String length, collect to list.   
+The difference becomes clearer. The first sentence doesn't make much sense, while the second one is a proper English sentence.
+By using static imports for static methods, you're not only writing cleaner code but also crafting code that speaks a language closer to everyday conversation. This practice not only enhances readability but also demonstrates your expertise in utilizing the full potential of Java's declarative APIs.
 
 ## Test behaviour, not implementation. 
 A prevalent misconception exists that unit tests should mock virtually all dependencies and scrutinize each class and method in isolation. While this approach is appropriate for testing library or utility functions, it can have detrimental effects when applied to testing business logic.
