@@ -9,6 +9,8 @@
   * [Prefer declarative style over imperative one](#prefer-declarative-style-over-imperative-one)
   * [Use static imports for static declarative APIs](#use-static-imports-for-static-declarative-apis)
   * [Test behaviour, not implementation](#test-behaviour-not-implementation)
+  * [Write code from left to right, from top to bottom (for sinistrodextral human languages speakers)](#write-code-from-left-to-right-from-top-to-bottom-for-sinistrodextral-human-languages-speakers)
+  * [Use named parameters](#use-named-parameters)
 <!-- TOC -->
 
 ## Introduction
@@ -30,6 +32,9 @@ Building a custom framework from scratch can be alluring, promising tailor-made 
 
 1. **Resource intensive and complex**  
 Developing a custom framework demands significant investments of time, effort, and resources. Crafting an effective framework requires a deep understanding of software architecture, design patterns, and scalability principles. Additionally, creating a comprehensive solution that addresses various scenarios and edge cases introduces complexity that's often underestimated.
+
+1. **IDE support**   
+When developing custom frameworks, take in mind that frameworks usually requires additional tooling. The less a framework is popular, the more essential is tooling to support developers due to continues lack of own and community experience.  
 
 1. **Maintenance burden and opportunity cost**   
 Once the custom framework is in place, ongoing maintenance becomes a substantial commitment. This includes fixing bugs, implementing updates, and ensuring compatibility as technology evolves. The time and resources devoted to maintaining the framework can divert attention from other critical aspects of your project, impacting its core goals.
@@ -226,15 +231,15 @@ Wrong unit test example:
 public class OrderServiceTest {
 
     @Mock
-    InventoryService inventoryService;
+    private InventoryService inventoryService;
     @Mock
-    EmailService emailService;
+    private EmailService emailService;
     
     @InjectMocks
-    OrderService orderService; 
+    private OrderService orderService; 
     
     @Test
-    public void testPlaceOrder() {
+    void testPlaceOrder() {
         // given
         Order order = new Order(/* ... */);
         when(inventoryService.checkAvailability(order)).thenReturn(true);
@@ -253,43 +258,110 @@ Better unit test:
 ```java
 public class OrderScenariosTest {
 
-  InMemoryInventoryRepository inventoryRepository = new InMemoryInventoryRepository();
-  InMemoryOrderRepository orderRepository = new InMemoryOrderRepository();
-  InMemoryEmpailService emailService = new InMemoryEmpailService();
-  OrderService orderService;
-
-  @BeforeEach
-  void init() {
-    orderService = 
-        new DefaultOrderService(
-            new DefaultInventoryService(inventoryRepository),
-            emailService,
-            orderRepository
-        );
-  }
-
-  @Test
-  public void testPlaceNewOrderWhenInventoryExists() {
-    // given
-    // setup inventory inventoryRepository.save(...)
-    // setup other necessary state of a system
-    Order order = new Order(/* ... */);
-
-    // when
-    orderService.placeOrder(order);
-
-    // then (verifies behavior, i.e. that some state changed, some notifications sent, etc. )
-    assertTnat(orderRepository.findById(order.getId())).isNotNull();
-    assertThat(emailService.getNotifications())
-            .satisfiesExactlyInAnyOrder(
-                    email -> isEmailToOwner(email), 
-                    email -> isEmailToBuyer(email)
-            );
-    // other verifications for the desired behavior
-  }
+    private InMemoryInventoryRepository inventoryRepository = new InMemoryInventoryRepository();
+    private InMemoryOrderRepository orderRepository = new InMemoryOrderRepository();
+    private InMemoryEmpailService emailService = new InMemoryEmpailService();
+    private OrderService orderService;
+    
+    @BeforeEach
+    void init() {
+      orderService = 
+          new DefaultOrderService(
+              new DefaultInventoryService(inventoryRepository),
+              emailService,
+              orderRepository
+          );
+    }
+    
+    @Test
+    void testPlaceNewOrderWhenInventoryExists() {
+      // given
+      
+      // setup inventory inventoryRepository.save(...)
+      // setup other necessary state of a system
+      // prepare input data
+      Order order = new Order(/* ... */);
+    
+      // when
+      orderService.placeOrder(order);
+    
+      // then (verifies behavior, i.e. that some state changed, some notifications sent, etc. )
+      assertTnat(orderRepository.findById(order.getId())).isNotNull();
+      assertThat(emailService.getNotifications())
+              .satisfiesExactlyInAnyOrder(
+                      email -> isEmailToOwner(email), 
+                      email -> isEmailToBuyer(email)
+              );
+      // other verifications for the desired behavior
+    }
 }
 ```
 However, JUnit framework is not the best choice for good unit tests. 
 There are better alternatives like [Cucumber](https://cucumber.io/) or [Spock](https://spockframework.org/). 
 
-## Write code from left to right (for sinistrodextral languages speakers)  
+## Write code from left to right, from top to bottom (for sinistrodextral human languages speakers)
+
+Consistently writing code in a left-to-right, top-to-bottom manner enhances code readability and makes it easier to follow the logic of your program. It mirrors the natural way we read and understand languages, ensuring a seamless flow of comprehension.
+
+Example of bad, right-to-left formatting:
+```java
+1 Stream.of("Hello", "World", "!")
+2    .flatMapToInt(word -> word.chars()
+3        .filter(ch -> ch == 'H')
+4        .map(ch -> ch + 1)
+5    )
+```
+In this example, operations on the characters (lines 3-4) are on the left side relative to the source of these characters (line 2). 
+This can create a false impression that these operations are performed on the **word** itself, rather than **word.chars()**. 
+When additional levels of enclosing functions are added, the complexity grows, potentially leading to confusion.
+
+To avoid potential confusion and improve code readability, use a left-to-right, top-to-bottom formatting approach. 
+Enclose operations consistently to align with their context and logical structure.
+Good example:
+```java
+Stream.of("Hello", "World", "!")
+    .flatMapToInt(word ->
+        word.chars()
+            .filter(ch -> ch == 'H')
+            .map(ch -> ch + 1)
+    )
+```
+
+In the example above, each operation is enclosed in a clear, nested structure, making it easier to comprehend the sequence of actions and their relationship to the source data.  
+You might wonder why the word in `.flatMapToInt(word ->` is not moved to a new line. The reason is that when you call methods like `map`, `flatMap`, `fold`, `compose`, and others, you can usually deduce from the context that your first line of a multiline lambda works with a variable from your Stream or other source which you use. Therefore, adding one more level of indentation can be a bit excessive.
+
+By adhering to the practice of writing code from left to right and from top to bottom, you enhance not only the readability of your code but also its understandability. The consistency in formatting guides developers through the logical flow of your code, leading to more effective collaboration and maintenance.
+
+## Use named parameters
+
+Surprised to hear this? Yes, you can indeed implement named parameters in Java! However, there are limitations to where you can apply them.
+
+One excellent use case for named parameters is the builder pattern. Let's explore this with an example:
+
+```java
+Transaction.builder()
+    // @formatter:off
+    .with(tx -> {
+        tx.transactionId = generateUniqueId();
+        tx.sender = new User("Alice");
+        tx.receiver = new User("Bob");
+        tx.amount = calculateTransactionAmount();
+    })
+    // @formatter:on
+    .build();
+```
+In this example, the named parameters in the builder pattern make the code much more readable and intuitive. Each property assignment is clearly labeled, allowing you to easily understand the intent of each line.
+
+Now, compare the named parameter approach with the traditional constructor initialization:
+```java
+new Transaction(
+    generateUniqueId(),
+    new User("Alice"),
+    new User("Bob"),
+    calculateTransactionAmount()
+)
+```
+
+In the constructor initialization example, it's less clear at a glance who is the sender and who is the receiver. The order of arguments might lead to confusion, especially when dealing with constructors that have multiple parameters.
+
+Though named parameters may not be a universal feature in Java, they can be a powerful tool in certain contexts, such as the builder pattern. By employing named parameters, you improve code readability, reduce errors stemming from parameter order confusion, and enhance the overall clarity of your codebase.
