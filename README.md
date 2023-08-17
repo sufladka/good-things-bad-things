@@ -47,8 +47,6 @@ Introducing a custom framework requires your development team to invest time in 
 Take a look on any open-source framework. How long it took it to rise into useful product.  
 For example, [Spring Framework](https://github.com/spring-projects/spring-framework), a Java framework established in 2004. With 754 contributors and over 27,600 commits, significant resources and community support, a framework is an ongoing endeavor, continually evolving to meet changing needs.
 
-In conclusion, the decision to build a custom framework should be approached cautiously. Unless you have person-years of free resources to invest in development, maintenance, and documentation, leveraging well-established solutions like the Spring Framework is often more pragmatic. The complexities of framework development, coupled with the challenges of documentation and team learning, make opting for existing solutions a wise choice for most projects. Remember that simplicity and efficiency are often found not in building everything from scratch, but in leveraging the wisdom of the broader development community.
-
 **True stories (directed by Robert B. Weide)**  
 Actors:  
 Framework Supplier (FS): The developer who creates the framework.  
@@ -57,21 +55,21 @@ Framework Consumer (FC): The developer who utilizes the framework for daily task
 Story 0:   
 FC: This component is useless for our use case. Could you please ensure components work with real-life examples?   
 FS: We've tested it in our sandbox. It's your job to use it in real-life scenarios.  
-**Moral**: FS is usually out of business. That's why he develops a framework in isolation, ignoring actual business requirements.  
+**Moral**: FS often operates separately from actual business requirements when developing a framework. 
 
 Story 1:   
 FS: Due to limited capacity, troubleshooting the framework is now your responsibility, FC.   
 FC: Fuuuuu!  
-**Moral**: Developing a framework is expensive. FS doesn't have time to maintain a framework. He needs to develop new features.
+**Moral**: Developing a framework is resource-intensive, leaving FS with little time for maintenance.
 
 Story 2:  
-FC: (_Glancing at our tiny, chaotic, and poorly organized documentation, often lacking examples and sometimes even absent_) The documentation for our framework feels like fluffware.  
+FC: (_Observing our small, disorganized documentation, often lacking examples and sometimes even absent_) The documentation for our framework feels like fluffware.  
 FS: From our perspective, it's comprehensive and valuable. If you find details lacking, create tickets to address them.  
 FC: (_Mentally comparing our documentation with mature open-source frameworks_) I meant the documentation as a whole.  
 FS: If you believe something is missed, create tickets. Goodbye.  
-**Moral**: FS provides pure documentation for a framework and don't want to evaluate it by himself first, because he doesn't consume it. 
-But it's like giving code to a team for review without reviewing it by author first, or provide feature to QA for testing without testing by author first, or provide feature to PO for acceptance without testing by QA, etc.   
-Of course, in each case the issue will be addressed. The question is in time, cost and reputation.  
+**Moral**: FS provides documentation for the framework without personally evaluating it. This is akin to submitting code for review without first reviewing it themselves, or delivering a feature to QA for testing without author-initiated testing. While these issues can eventually be addressed, the timing, cost, and reputation implications differ. It highlights the importance of a proactive approach in assessing the quality and usability of the provided resources, rather than relying solely on external feedback.  
+
+**In conclusion**, the decision to build a custom framework should be approached cautiously. Unless you have person-years of free resources to invest in development, maintenance, and documentation, leveraging well-established solutions like the Spring Framework is often more pragmatic. The complexities of framework development, coupled with the challenges of documentation and team learning, make opting for existing solutions a wise choice for most projects. Remember that simplicity and efficiency are often found not in building everything from scratch, but in leveraging the wisdom of the broader development community.
 
 ## Avoid using XML
 
@@ -157,7 +155,7 @@ Stream.of("Hello", "World", "!")
     .collect(toUnmodifiableList());
 ```
 
-Here is another example:
+Here is another example from real life:
 ```java
 CompositeValidator.builder()
     // @formatter:off
@@ -180,9 +178,9 @@ private void validateCart() {
     validateShippingAddress();
 }
 ``` 
-Declarative code answers the question **how** we validate a cart: we ensure that cart is not empty, stock is sufficient, price is positive, etc. All validation rules are on your eyes.   
-Meanwhile, imperative code answers the question **what** we do in order to validate a cart: we validate items, validate price, etc. All validation rules are hidden behind private methods, while this is the only essential part of validation.
- 
+Declarative code addresses the question of **how** we validate a cart: it outlines the validation process explicitly, encompassing checks for an empty cart, sufficient stock, positive prices, and more. All the validation rules are transparent and easily discernible.  
+On the other hand, imperative code focuses on answering the question of **what** steps are taken to validate a cart: it involves validating items, confirming prices, and so forth. The validation rules are obscured within private methods, even though they form the essential foundation of the validation process.  
+
 The declarative approach is often preferred for several reasons:  
 * **Readability**: Declarative code reads like a description of the task, making it easier to understand without getting lost in implementation details.
 * **Conciseness**: Declarative code is usually shorter and more concise, reducing the chances of errors and making the codebase easier to maintain.
@@ -194,7 +192,8 @@ In your programming journey, strive to embrace the declarative style whenever po
 
 ## Use static imports for static declarative APIs
 
-I've emphasized the importance of using declarative APIs. To make them even more elegant, consider employing static imports for static methods where appropriate. 
+I've highlighted the significance of employing declarative APIs, which often shape a Domain Specific Language (DSL) and incorporate factories, effectively creating a dictionary of available terms — such as `Collectors` or `Comparators` in the Stream API. To enhance their elegance, consider utilizing static imports for appropriate static methods.  
+
 Let's compare these two code snippets:
 
 ```java
@@ -209,12 +208,23 @@ Stream.of("1", "2", "3")
 ```
 At first glance, they might seem the same, right? But actually, they aren't. The first version is notably less pleasant, squandering the tokens of your innate intelligence.  
 To see the difference clearer, let's attempt to translate both examples into plain English:  
-* Stream of 1, 2, 3, sorted Comparator comparing String length, collect Collectors to list.
-* Stream of 1, 2, 3, sorted comparing String length, collect to list.   
+1. Stream of 1, 2, 3, sorted Comparator comparing String length, collect Collectors to list.
+1. Stream of 1, 2, 3, sorted comparing String length, collect to list.   
 
-The first sentence doesn't make much sense, while the second one is a proper English sentence, isn't it?  
+The first sentence doesn't make much sense, while the second one is a proper English sentence, isn't it? 
+By using static imports for static methods, you're not only writing cleaner code but also crafting code that speaks a language closer to everyday conversation.   
 
-By using static imports for static methods, you're not only writing cleaner code but also crafting code that speaks a language closer to everyday conversation. 
+**When not to use static imports**  
+As with any good thing, it's essential to discern when and how to apply it without overuse. Utilize static imports when a static method retains meaning without the context of the class containing it.  
+The correct usage has been demonstrated above. Conversely, here's an instance of incorrect static import usage:
+```java
+import static java.util.List.of;
+
+var numbers = of(1, 2, 3);
+```
+In this example, the method `of` without `List` may lead to confusion.
+
+Incorporating static imports for static declarative APIs refines code elegance and clarity, aligning code with everyday language. However, it's crucial to apply this approach judiciously, as overuse may obscure meaning.
 
 ## Test behaviour, not implementation
 A prevalent misconception exists that unit tests should mock virtually all dependencies and scrutinize each class and method in isolation. While this approach is appropriate for testing library or utility functions, it can have detrimental effects when applied to testing business logic.  
