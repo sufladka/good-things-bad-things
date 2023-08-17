@@ -87,3 +87,13 @@ The gradual transition from XML-based configurations to more expressive alternat
 
 So, I urge you to consider the benefits of embracing newer, more efficient ways of expressing configurations and dependencies. As the development landscape evolves, it's crucial to adapt and leverage tools that make your work both enjoyable and effective.
 
+
+
+## Test behaviour, not implementation. 
+A prevalent misconception exists that unit tests should mock virtually all dependencies and scrutinize each class and method in isolation. While this approach is appropriate for testing library or utility functions, it can have detrimental effects when applied to testing business logic.
+
+But what exactly are unit tests meant to achieve? Their purpose is to guarantee that your code retains functionality throughout refactoring or the introduction of new features. If you find yourself modifying code and needing to adjust tests to accommodate the new implementation, these tests become counterproductive. Worse still, they result in duplicated efforts. In simpler terms, rather than facilitating refactoring, such tests impede it.  
+
+Wrong unit test example:
+...
+
