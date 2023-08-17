@@ -4,6 +4,7 @@
 * [Good Things - Bad Things: A Cookbook for Java Developers](#good-things---bad-things-a-cookbook-for-java-developers)
   * [Introduction](#introduction)
   * [Avoid creating custom frameworks unless you have person-years of free resources](#avoid-creating-custom-frameworks-unless-you-have-person-years-of-free-resources)
+  * [Separate infrastructure from business logic](#separate-infrastructure-from-business-logic)
   * [Avoid using XML](#avoid-using-xml)
   * [Avoid overusing private methods](#avoid-overusing-private-methods)
   * [Prefer declarative style over imperative one](#prefer-declarative-style-over-imperative-one)
@@ -70,6 +71,12 @@ FS: If you believe something is missed, create tickets. Goodbye.
 **Moral**: FS provides documentation for the framework without personally evaluating it. This is akin to submitting code for review without first reviewing it themselves, or delivering a feature to QA for testing without author-initiated testing. While these issues can eventually be addressed, the timing, cost, and reputation implications differ. It highlights the importance of a proactive approach in assessing the quality and usability of the provided resources, rather than relying solely on external feedback.  
 
 **In conclusion**, the decision to build a custom framework should be approached cautiously. Unless you have person-years of free resources to invest in development, maintenance, and documentation, leveraging well-established solutions like the Spring Framework is often more pragmatic. The complexities of framework development, coupled with the challenges of documentation and team learning, make opting for existing solutions a wise choice for most projects. Remember that simplicity and efficiency are often found not in building everything from scratch, but in leveraging the wisdom of the broader development community.
+
+## Separate infrastructure from business logic
+
+Returning to the topic of frameworks, it's essential to recognize that frameworks are primarily designed for infrastructure-related tasks, addressing technical challenges rather than business concerns. If you choose to utilize frameworks, it's crucial to prevent them from permeating your business logic. Remember, the landscape of infrastructure is dynamic, and what's in favor today might become a hindrance tomorrow.
+
+To avoid becoming ensnared in an outdated technology stack, it's wise to insulate your business logic from such shifts. This separation not only safeguards your core logic but also makes testing significantly easier, leading to more maintainable and adaptable systems. A viable solution lies in adopting architectural patterns like hexagonal or onion architecture, which emphasize the segregation of concerns and protect your core business logic from being entangled with transient technical intricacies.
 
 ## Avoid using XML
 
